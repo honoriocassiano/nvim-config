@@ -29,43 +29,6 @@ Plugin 'ycm-core/YouCompleteMe'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
-" NERDTree configurations
-nmap <F6> :NERDTreeToggle<CR>
-
-" YouCompleteMe settings
-set completeopt=menu
-
-let g:ycm_key_list_select_completion = ['<Down>']
-let g:ycm_key_list_previous_completion = ['<Up>']
-" ----------------------------------------------------------------------------------
-" Ctrlp settings
-let ctrlp_working_path_mode = 'r'
-
-set wildignore+=*/tmp/*,*/target/*,*.so,*.swp,*.zip     " MacOSX/Linux
-set wildignore+=*\\tmp\\*,*\\target\\*,*.swp,*.zip,*.exe  " Windows
-
-let g:ctrlp_follow_symlinks=1
-let g:ctrlp_cmd='CtrlPRoot'
-let g:ctrlp_use_caching=0
-
-" let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
-" let g:ctrlp_custom_ignore = {
-"   \ 'dir':  '\v[\/]\.(git|hg|svn|target)$',
-"   \ 'file': '\v\.(exe|so|dll)$',
-"   \ }
-
-" ----------------------------------------------------------------------------------
-
-" Util Snips settings
-let g:UltiSnipsSnippetsDir = $HOME.'/vimfiles/bundle/vim-snippets/UltiSnips'
-
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
-
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
-
 " ----------------------------------------------------------------------------------
 " VIM Editor settings
 " Config line numbers
@@ -93,6 +56,45 @@ let c_space_errors = 1
 
 set list
 set listchars=trail:.
+
+" ----------------------------------------------------------------------------------
+" Ctrlp settings
+let ctrlp_working_path_mode = 'r'
+
+set wildignore+=*/tmp/*,*/target/*,*.so,*.swp,*.zip     " MacOSX/Linux
+set wildignore+=*\\tmp\\*,*\\target\\*,*.swp,*.zip,*.exe  " Windows
+
+let g:ctrlp_follow_symlinks=1
+let g:ctrlp_cmd='CtrlPRoot'
+let g:ctrlp_use_caching=0
+
+" let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+" let g:ctrlp_custom_ignore = {
+"   \ 'dir':  '\v[\/]\.(git|hg|svn|target)$',
+"   \ 'file': '\v\.(exe|so|dll)$',
+"   \ }
+
+" ----------------------------------------------------------------------------------
+" NERDTree configurations
+nmap <F6> :NERDTreeToggle<CR>
+
+" ----------------------------------------------------------------------------------
+" Util Snips settings
+let g:UltiSnipsSnippetsDir = $HOME.'/vimfiles/bundle/vim-snippets/UltiSnips'
+
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<S-tab>"
+
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
+
+" ----------------------------------------------------------------------------------
+" YouCompleteMe settings
+set completeopt=menu
+
+let g:ycm_key_list_select_completion = ['<Down>']
+let g:ycm_key_list_previous_completion = ['<Up>']
 
 " ----------------------------------------------------------------------------------
 " Specific language settings
