@@ -1,3 +1,6 @@
+" ----------------------------------------------------------------------------------
+" Plugin definitions
+" ----------------------------------------------------------------------------------
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
@@ -25,6 +28,7 @@ filetype plugin indent on    " required
 
 " ----------------------------------------------------------------------------------
 " VIM Editor settings
+" ----------------------------------------------------------------------------------
 " Config line numbers
 set autoindent
 set autoread
@@ -53,10 +57,11 @@ set listchars=trail:.
 
 " ----------------------------------------------------------------------------------
 " Ctrlp settings
+" ----------------------------------------------------------------------------------
 let ctrlp_working_path_mode = 'r'
 
-set wildignore+=*/tmp/*,*/target/*,*.so,*.swp,*.zip     " MacOSX/Linux
-set wildignore+=*\\tmp\\*,*\\target\\*,*.swp,*.zip,*.exe  " Windows
+set wildignore+=*/tmp/*,*/target/*,*.so,*.swp,*.zip      " MacOSX/Linux
+set wildignore+=*\\tmp\\*,*\\target\\*,*.swp,*.zip,*.exe " Windows
 
 let g:ctrlp_follow_symlinks=1
 let g:ctrlp_cmd='CtrlPRoot'
@@ -70,10 +75,12 @@ let g:ctrlp_use_caching=0
 
 " ----------------------------------------------------------------------------------
 " NERDTree configurations
+" ----------------------------------------------------------------------------------
 nmap <F6> :NERDTreeToggle<CR>
 
 " ----------------------------------------------------------------------------------
 " Util Snips settings
+" ----------------------------------------------------------------------------------
 let g:UltiSnipsSnippetsDir = $HOME.'/vimfiles/bundle/vim-snippets/UltiSnips'
 
 let g:UltiSnipsExpandTrigger="<tab>"
@@ -85,6 +92,7 @@ let g:UltiSnipsEditSplit="vertical"
 
 " ----------------------------------------------------------------------------------
 " YouCompleteMe settings
+" ----------------------------------------------------------------------------------
 set completeopt=menu
 
 let g:ycm_key_list_select_completion = ['<Down>']
