@@ -13,19 +13,18 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'honza/vim-snippets'
 Plugin 'preservim/nerdtree'
-
+Plugin 'rust-lang/rust.vim'
+Plugin 'SirVer/ultisnips'
+Plugin 'tomtom/tcomment_vim'
+Plugin 'tpope/vim-dispatch'
+Plugin 'tpope/vim-fugitive'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-Plugin 'rust-lang/rust.vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
-Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'tomtom/tcomment_vim'
 Plugin 'ycm-core/YouCompleteMe'
-
-Plugin 'altercation/vim-colors-solarized'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
