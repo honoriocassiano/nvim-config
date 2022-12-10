@@ -25,6 +25,7 @@ Plugin 'preservim/tagbar'
 Plugin 'godlygeek/tabular'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-sensible'
+Plugin 'easymotion/vim-easymotion'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -38,8 +39,8 @@ set inccommand=nosplit
 
 set autoindent
 set autoread
-set number
-set relativenumber
+set cursorline
+" set relativenumber
 
 " Disable highlight search
 set nohlsearch
@@ -49,6 +50,9 @@ set expandtab
 set shiftwidth=4
 set softtabstop=4
 set tabstop=4
+
+" Open tabs on the right
+set splitright
 
 " Theme
 colorscheme solarized
@@ -63,6 +67,27 @@ set linespace=3
 set list
 set listchars=trail:¶
 
+fu! SaveSess()
+    execute 'mksession! ' . getcwd() . '/.session.vim'
+endfunction
+
+fu! RestoreSess()
+if filereadable(getcwd() . '/.session.vim')
+    execute 'so ' . getcwd() . '/.session.vim'
+endif
+endfunction
+
+" Autocommands
+
+autocmd VimLeave * call SaveSess()
+autocmd VimEnter * call RestoreSess()
+
+autocmd FocusLost * silent! :up
+
+autocmd FileType html setlocal ts=2 sts=2 sw=2
+autocmd FileType css setlocal ts=2 sts=2 sw=2
+
+autocmd BufNew,BufRead *.ejs :set filetype=html
 " ----------------------------------------------------------------------------------
 " Ctrlp settings
 " ----------------------------------------------------------------------------------
@@ -77,7 +102,7 @@ let g:ctrlp_use_caching=0
 
 " let g:ctrlp_custom_ignore='\v[\/]\.(git|hg|svn)$'
 let g:ctrlp_custom_ignore={
-  \ 'dir':  '\v[\/](\.(git|hg|svn|target))|(build)$',
+  \ 'dir':  '\v[\/](\.(git|hg|svn|target))|(build)|(node_modules)$',
   \ 'file': '\v\.(exe|so|dll)$',
   \ }
 
@@ -104,7 +129,23 @@ map gt :YcmCompleter GoTo<CR>
 
 au BufWritePost *.c,*.cpp,*.h silent! !ctags -R %
 nmap <F8> :silent! :TagbarToggle<CR>
+" ----------------------------------------------------------------------------------
+" Easymotion
+" ----------------------------------------------------------------------------------
+" <Leader>f{char} to move to {char}
+map  <Leader>f <Plug>(easymotion-bd-f)
+nmap <Leader>f <Plug>(easymotion-overwin-f)
 
+" s{char}{char} to move to {char}{char}
+nmap s <Plug>(easymotion-overwin-f2)
+
+" Move to line
+map <Leader>L <Plug>(easymotion-bd-jk)
+nmap <Leader>L <Plug>(easymotion-overwin-line)
+
+" Move to word
+map  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
 " ----------------------------------------------------------------------------------
 " Specific language settings
 " ----------------------------------------------------------------------------------
@@ -118,16 +159,11 @@ let g:haskellmode_completion_ghc=0
 autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
 let g:necoghc_enable_detailed_browse=1
 
-" Useful shortcuts
-let mapleader=" "
-
-inoremap jk <Esc>
-inoremap kj <Esc>
+" Usefuol shortcuts
+map <Space> <Leader>
 
 nnoremap \ ^
 vnoremap \ ^
-
-nnoremap <Leader><Leader> :
 
 nnoremap <Leader>p "+p
 nnoremap <Leader>P "+P
@@ -140,4 +176,34 @@ vnoremap <Leader>y "+y
 vnoremap <Leader>Y "+Y
 
 nnoremap <Leader>s :vsplit $NVIMRC
-nnoremap <Leader>w :w<CR>
+" nnoremap <Leader>w :w<CR>
+
+nnoremap <Leader>i <C-i>
+nnoremap <Leader>o <C-o>
+
+vmap > >gv
+vmap < <gv
+
+imap <A-k> <Up>
+imap <A-j> <Down>
+imap <A-h> <Left>
+imap <A-l> <Right>
+imap <A-w> <C-o>w
+imap <A-W> <C-o>W
+imap <A-e> <C-o>e
+imap <A-E> <C-o>E
+imap <A-b> <C-o>b
+imap <A-B> <C-o>B
+
+inoremap <c-u> <c-g>u<c-u>
+inoremap <c-w> <c-g>u<c-w>
+
+:command W w
+:command Q q
+
+nnoremap <Tab> <Esc>
+vnoremap <Tab> <Esc>gV
+onoremap <Tab> <Esc>
+cnoremap <Tab> <C-C><Esc>
+inoremap <Tab> <Esc>`^
+inoremap <Leader><Tab> <Tab>
