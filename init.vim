@@ -67,20 +67,29 @@ set linespace=3
 set list
 set listchars=trail:¶
 
-fu! SaveSess()
+fu! SessionSave()
     execute 'mksession! ' . getcwd() . '/.session.vim'
 endfunction
 
-fu! RestoreSess()
+fu! SessionRestore()
 if filereadable(getcwd() . '/.session.vim')
     execute 'so ' . getcwd() . '/.session.vim'
 endif
 endfunction
 
+command -nargs=1 SessionCd call SessionCd(<q-args>)
+function SessionCd(path)
+    let seila=string(a:path)
+    " echo seila
+    " echo 'cd ' . a:path
+    exe 'cd ' . a:path
+    call SessionRestore()
+endfunction
+
 " Autocommands
 
-autocmd VimLeave * call SaveSess()
-autocmd VimEnter * call RestoreSess()
+autocmd VimLeave * call SessionSave()
+autocmd VimEnter * call SessionRestore()
 
 autocmd FocusLost * silent! :up
 
@@ -117,9 +126,6 @@ let g:NERDTreeWinPos="right"
 " YouCompleteMe settings
 " ----------------------------------------------------------------------------------
 set completeopt=menu
-
-let g:ycm_key_list_select_completion=['<C-j>']
-let g:ycm_key_list_previous_completion=['<C-k>']
 
 let g:ycm_global_ycm_extra_conf="~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py"
 let g:ycm_confirm_extra_conf=0
@@ -204,6 +210,5 @@ inoremap <c-w> <c-g>u<c-w>
 nnoremap <Tab> <Esc>
 vnoremap <Tab> <Esc>gV
 onoremap <Tab> <Esc>
-cnoremap <Tab> <C-C><Esc>
 inoremap <Tab> <Esc>`^
 inoremap <Leader><Tab> <Tab>
