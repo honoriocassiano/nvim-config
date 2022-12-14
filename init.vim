@@ -19,13 +19,14 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'ycm-core/YouCompleteMe'
-Plugin 'koron/nyancat-vim'
 Plugin 'tpope/vim-capslock'
 Plugin 'preservim/tagbar'
 Plugin 'godlygeek/tabular'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-sensible'
 Plugin 'easymotion/vim-easymotion'
+Plugin 'xolox/vim-misc'
+Plugin 'xolox/vim-easytags'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -40,7 +41,8 @@ set inccommand=nosplit
 set autoindent
 set autoread
 set cursorline
-" set relativenumber
+
+set background=light
 
 " Disable highlight search
 set nohlsearch
@@ -60,13 +62,19 @@ colorscheme solarized
 " Show useless whitespaces
 let c_space_errors=1
 
-set guifont=Fira\ Code:h10
-set linespace=3
+set guifont=Monolisa:h9
+set linespace=1
+
+" Margem para rolagem vertical e horizontal
+set scrolloff=3
+set sidescroll=3
 
 " Show trailing characters
 set list
 set listchars=trail:¶
 
+" Salva a porra (quase) toda na sessão
+set sessionoptions=blank,buffers,curdir,folds,help,options,tabpages,winsize
 fu! SessionSave()
     execute 'mksession! ' . getcwd() . '/.session.vim'
 endfunction
@@ -77,7 +85,7 @@ if filereadable(getcwd() . '/.session.vim')
 endif
 endfunction
 
-command -nargs=1 SessionCd call SessionCd(<q-args>)
+command -nargs=1 -complete=dir SessionCd call SessionCd(<q-args>)
 function SessionCd(path)
     let seila=string(a:path)
     " echo seila
@@ -109,18 +117,24 @@ let g:ctrlp_follow_symlinks=1
 let g:ctrlp_cmd='CtrlPRoot'
 let g:ctrlp_use_caching=0
 
-" let g:ctrlp_custom_ignore='\v[\/]\.(git|hg|svn)$'
 let g:ctrlp_custom_ignore={
   \ 'dir':  '\v[\/](\.(git|hg|svn|target))|(build)|(node_modules)$',
   \ 'file': '\v\.(exe|so|dll)$',
   \ }
 
 " ----------------------------------------------------------------------------------
+" Easytags configurations
+" ----------------------------------------------------------------------------------
+" Atualiza as tags após o salvamento de um arquivo
+let g:easytags_events = ['BufWritePost']
+" ----------------------------------------------------------------------------------
 " NERDTree configurations
 " ----------------------------------------------------------------------------------
 nmap <F6> :NERDTreeToggle<CR>
 
 let g:NERDTreeWinPos="right"
+" Fecha a janela do NERDTree após abrir um arquivo
+let NERDTreeQuitOnOpen=1
 
 " ----------------------------------------------------------------------------------
 " YouCompleteMe settings
@@ -133,7 +147,6 @@ let g:ycm_update_diagnostics_in_insert_mode=0
 let g:ycm_echo_current_diagnostic="virtual-text"
 map gt :YcmCompleter GoTo<CR>
 
-au BufWritePost *.c,*.cpp,*.h silent! !ctags -R %
 nmap <F8> :silent! :TagbarToggle<CR>
 " ----------------------------------------------------------------------------------
 " Easymotion
@@ -212,3 +225,21 @@ vnoremap <Tab> <Esc>gV
 onoremap <Tab> <Esc>
 inoremap <Tab> <Esc>`^
 inoremap <Leader><Tab> <Tab>
+
+" Mostra as correspondências (buscas) no centro da tela
+function! CenteredFindNext(forward)
+    let s:so_curr=&scrolloff
+    set scrolloff=999
+    try
+        if a:forward
+            silent normal! n
+        else
+            silent normal! N
+        endif
+    finally
+        let &scrolloff=s:so_curr
+    endtry
+endfunction
+
+nnoremap <silent>n :call CenteredFindNext(1)<CR>
+nnoremap <silent>N :call CenteredFindNext(0)<CR>
