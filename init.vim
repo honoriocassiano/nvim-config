@@ -41,6 +41,7 @@ set inccommand=nosplit
 set autoindent
 set autoread
 set cursorline
+set nowrap
 
 set background=light
 
@@ -96,15 +97,16 @@ endfunction
 
 " Autocommands
 
-autocmd VimLeave * call SessionSave()
-autocmd VimEnter * call SessionRestore()
+au VimLeave * call SessionSave()
+au VimEnter * call SessionRestore()
 
-autocmd FocusLost * silent! :up
+au FocusLost * silent! :wa
+au FocusGained,BufEnter * :checktime
 
-autocmd FileType html setlocal ts=2 sts=2 sw=2
-autocmd FileType css setlocal ts=2 sts=2 sw=2
+au FileType html setlocal ts=2 sts=2 sw=2
+au FileType css setlocal ts=2 sts=2 sw=2
 
-autocmd BufNew,BufRead *.ejs :set filetype=html
+au BufNew,BufRead *.ejs :set filetype=html
 " ----------------------------------------------------------------------------------
 " Ctrlp settings
 " ----------------------------------------------------------------------------------
@@ -159,8 +161,8 @@ nmap <Leader>f <Plug>(easymotion-overwin-f)
 nmap s <Plug>(easymotion-overwin-f2)
 
 " Move to line
-map <Leader>L <Plug>(easymotion-bd-jk)
-nmap <Leader>L <Plug>(easymotion-overwin-line)
+map <Leader>l <Plug>(easymotion-bd-jk)
+nmap <Leader>l <Plug>(easymotion-overwin-line)
 
 " Move to word
 map  <Leader>w <Plug>(easymotion-bd-w)
@@ -178,7 +180,7 @@ let g:haskellmode_completion_ghc=0
 autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
 let g:necoghc_enable_detailed_browse=1
 
-" Usefuol shortcuts
+" Useful shortcuts
 map <Space> <Leader>
 
 nnoremap \ ^
@@ -243,3 +245,6 @@ endfunction
 
 nnoremap <silent>n :call CenteredFindNext(1)<CR>
 nnoremap <silent>N :call CenteredFindNext(0)<CR>
+
+nnoremap <F7> :cn<CR>
+nnoremap <S-F7> :cp<CR>
