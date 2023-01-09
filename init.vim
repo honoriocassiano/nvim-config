@@ -9,7 +9,7 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 
-Plugin 'altercation/vim-colors-solarized'
+Plugin 'overcache/NeoSolarized'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'preservim/nerdtree'
 Plugin 'rust-lang/rust.vim'
@@ -27,14 +27,18 @@ Plugin 'tpope/vim-sensible'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'xolox/vim-misc'
 Plugin 'xolox/vim-easytags'
+Plugin 'vimwiki/vimwiki'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
-
+syntax on
 " ----------------------------------------------------------------------------------
 " VIM Editor settings
 " ----------------------------------------------------------------------------------
 " Config line numbers
+set nonumber
+set norelativenumber
+
 set mouse=a
 set inccommand=nosplit
 
@@ -58,7 +62,7 @@ set tabstop=4
 set splitright
 
 " Theme
-colorscheme solarized
+colorscheme NeoSolarized
 
 " Show useless whitespaces
 let c_space_errors=1
@@ -227,6 +231,26 @@ vnoremap <Tab> <Esc>gV
 onoremap <Tab> <Esc>
 inoremap <Tab> <Esc>`^
 inoremap <Leader><Tab> <Tab>
+
+" Abrir o sublime em uma posição específica
+command Subl call Subl()
+function Subl()
+    let file = expand('%')
+
+    if empty(file)
+        echohl ErrorMsg
+        echom "No named buffer!"
+        echohl None
+    else
+        let pos = getpos('.')
+        let location = file . ':' . pos[1] . ':' . pos[2]
+
+        let command = "!\"C:\\Program Files\\Sublime Text\\subl.exe\" -a " . location
+
+        " Atualiza o arquivo e abre o Sublime
+        :silent up | silent exe command
+    endif
+endfunction
 
 " Mostra as correspondências (buscas) no centro da tela
 function! CenteredFindNext(forward)
