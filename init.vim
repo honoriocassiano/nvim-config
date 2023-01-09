@@ -97,6 +97,7 @@ function SessionCd(path)
     " echo 'cd ' . a:path
     exe 'cd ' . a:path
     call SessionRestore()
+    normal! :CtrlPDir :pwd<ESC>
 endfunction
 
 " Autocommands
