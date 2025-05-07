@@ -1,37 +1,41 @@
+
 " ----------------------------------------------------------------------------------
 " Plugin definitions
 " ----------------------------------------------------------------------------------
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
-set rtp+=~/.vim/bundle/Vundle.vim
+set rtp+=~/.config/nvim/init.vim,~/.vim/bundle/Vundle.vim,~/.vim/themes
 call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 
-Plugin 'overcache/NeoSolarized'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'preservim/nerdtree'
-Plugin 'rust-lang/rust.vim'
 Plugin 'tomtom/tcomment_vim'
 Plugin 'tpope/vim-dispatch'
-Plugin 'ycm-core/YouCompleteMe'
 Plugin 'tpope/vim-capslock'
 Plugin 'godlygeek/tabular'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-sensible'
-Plugin 'easymotion/vim-easymotion'
 Plugin 'vimwiki/vimwiki'
-Plugin 'digitaltoad/vim-pug'
 Plugin 'tikhomirov/vim-glsl'
-Plugin 'habamax/vim-godot'
 Plugin 'qpkorr/vim-bufkill'
-Plugin 'elixir-editors/vim-elixir'
 Plugin 'Asheq/close-buffers.vim'
+Plugin 'soramugi/auto-ctags.vim'
+Plugin 'preservim/tagbar'
+Plugin 'junegunn/goyo.vim'
+Plugin 'neovim/nvim-lspconfig'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
 syntax on
+
+" :wshada sobrescreve o arquivo e remove os jumps salvos
+" set shada=!,'1,<50,s10,h
+
+autocmd VimEnter * exe 'tabdo windo clearjumps | tabnext'
+
 " ----------------------------------------------------------------------------------
 " VIM Editor settings
 " ----------------------------------------------------------------------------------
@@ -39,7 +43,7 @@ syntax on
 set number
 set relativenumber
 
-set mouse=a
+" set mouse=a
 set inccommand=nosplit
 
 set autoindent
@@ -65,14 +69,13 @@ set splitright
 set undofile
 
 " Theme
-colorscheme NeoSolarized
+" colorscheme default
+colorscheme white
 
 " Show useless whitespaces
 let c_space_errors=1
 
-set guifont=Monolisa:h9
-
-set linespace=1
+set linespace=0
 
 " Margem para rolagem vertical e horizontal
 set scrolloff=3
@@ -89,10 +92,13 @@ fu! SessionSave()
 endfunction
 
 fu! SessionRestore()
-let dir=getcwd()
-if filereadable(dir . '/.session.vim') && dir != $NVIM_HOME
-    execute 'so ' . dir . '/.session.vim'
-endif
+    let dir=getcwd()
+    if filereadable(dir . '/.session.vim') && dir != $NVIM_HOME && dir != $HOME
+        execute 'so ' . dir . '/.session.vim'
+    endif
+    if filereadable(dir . '/abbrev.vim') && dir != $NVIM_HOME
+        execute 'so ' . dir . '/abbrev.vim'
+    endif
 endfunction
 
 command -nargs=1 -complete=dir SessionCd call SessionCd(<q-args>)
@@ -119,30 +125,84 @@ augroup alttab
     au FocusGained,BufEnter [^\[]*[^\]] :checktime
 augroup end
 
+augroup cpp
+    au!
+    au FileType cpp setlocal ts=4 sts=4 sw=4
+    au FileType c   setlocal ts=4 sts=4 sw=4
+
+    au FileType cpp imap <F13> constexpr auto () noexcept -> void<cr>{<cr>}<esc>kkf(i
+    au FileType cpp nmap <F13> iconstexpr auto () noexcept -> void<cr>{<cr>}<esc>kkf(i
+
+    au FileType cpp imap <F12> =nullptr)<c-o>F=
+    au FileType cpp nmap <F12> a=nullptr)<c-o>F=
+augroup end
+
 augroup web
     au!
     au FileType html setlocal ts=2 sts=2 sw=2
     au FileType css setlocal ts=2 sts=2 sw=2
 
-    au BufNew,BufNewFile,BufRead *.ejs :set filetype=html
+    au BufNew,BufNewFile,BufRead *.ejs set filetype=html
 augroup end
+
+augroup premd
+    au!
+    au BufNew,BufNewFile,BufRead *.pmd set filetype=markdown
+augroup end
+" ----------------------------------------------------------------------------------
+" Tabular settings
+" ----------------------------------------------------------------------------------
+" xnoremap t :Tabularize<space>/
+
 " ----------------------------------------------------------------------------------
 " Ctrlp settings
 " ----------------------------------------------------------------------------------
-let ctrlp_working_path_mode='r'
+let ctrlp_working_path_mode='ra'
 
-set wildignore+=*/tmp/*,*/target/*,*.so,*.swp,*.zip      " MacOSX/Linux
+set wildignore+=*/tmp/*,*/target/*,*.so,*.swp,*.zip            " MacOSX/Linux
 set wildignore+=*\\tmp\\*,*\\target\\*,*.swp,*.zip,*.exe,*.dll " Windows
 
 let g:ctrlp_follow_symlinks=1
-let g:ctrlp_cmd='CtrlPRoot'
+let g:ctrlp_cmd='CtrlP :pwd'
 let g:ctrlp_use_caching=0
+let g:ctrlp_switch_buffer='ET'
 
 let g:ctrlp_custom_ignore={
   \ 'dir':  '\v[\/](\.(git|hg|svn|target))|(build)|(node_modules)$',
   \ 'file': '\v\.(exe|so|dll)$',
   \ }
+" ----------------------------------------------------------------------------------
+" Tagbar settings
+" ----------------------------------------------------------------------------------
 
+imap <F8> <esc>:TagbarToggle<CR>
+nmap <F8> :TagbarToggle<CR>
+
+let g:tagbar_autofocus = 1
+let g:tagbar_autoclose = 1
+let g:tagbar_autoclose_netrw = 1
+
+" ----------------------------------------------------------------------------------
+" Tcommenter settings
+" ----------------------------------------------------------------------------------
+let g:tcomment_maps = 0
+let g:tcomment#mode_extra = ''
+let g:tcomment#blank_lines = 2
+
+nnoremap <C-_> :TComment<cr>
+vnoremap <C-_> :TComment<cr>
+inoremap <C-_> <esc>:TComment<cr>i
+nnoremap <C-S-_> :TComment<cr>
+vnoremap <C-S-_> :TComment<cr>
+inoremap <C-S-_> <esc>:TComment<cr>i
+
+nnoremap <C-/> :TComment<cr>
+vnoremap <C-/> :TComment<cr>
+inoremap <C-/> <esc>:TComment<cr>i
+
+nnoremap <C-d> mayyp<s-v>:TComment<cr>`a
+inoremap <C-d> <esc>mayyp<s-v>:TComment<cr>`aa
+vnoremap <C-d> may`]p`[v`]:TComment<cr>`a
 " ----------------------------------------------------------------------------------
 " NERDTree configurations
 " ----------------------------------------------------------------------------------
@@ -154,97 +214,21 @@ let g:NERDTreeWinPos="right"
 let NERDTreeQuitOnOpen=1
 
 " ----------------------------------------------------------------------------------
-" YouCompleteMe settings
-" ----------------------------------------------------------------------------------
-set completeopt=menu
-
-let g:ycm_global_ycm_extra_conf="~/.vim/bundle/YouCompleteMe/.ycm_extra_conf.py"
-let g:ycm_confirm_extra_conf=0
-let g:ycm_update_diagnostics_in_insert_mode=0
-let g:ycm_echo_current_diagnostic="virtual-text"
-let g:ycm_auto_trigger=0
-map gt :YcmCompleter GoTo<CR>
-
-if !has_key( g:, 'ycm_language_server' )
-  let g:ycm_language_server = []
-endif
-
-function! RenameVariable()
-    let name = input("New name: ")
-
-    let command = "YcmCompleter RefactorRename " . name
-    exe command
-endfunction
-
-nmap <S-F6> <Cmd>call RenameVariable()<CR>
-imap <S-F6> <Esc><Cmd>call RenameVariable()<CR>
-
-" ----------------------------------------------------------------------------------
 " Dispatch
 " ----------------------------------------------------------------------------------
 let g:dispatch_no_maps = 1
+
+nmap <F9> :wa <bar> Dispatch<cr>
+imap <F9> <Esc>:wa <bar> Dispatch<cr>
+
 " ----------------------------------------------------------------------------------
-" Easymotion
+" Goyo
 " ----------------------------------------------------------------------------------
-" <Leader>f{char} to move to {char}
-map  <Leader>f <Plug>(easymotion-bd-f)
-nmap <Leader>f <Plug>(easymotion-overwin-f)
+autocmd! User GoyoEnter nested call <SID>ActivateWrap()
+autocmd! User GoyoLeave nested call <SID>DeactivateWrap()
 
-" s{char}{char} to move to {char}{char}
-nmap s <Plug>(easymotion-overwin-f2)
+autocmd! VimLeavePre * :Goyo!
 
-" Move to line
-map <Leader>l <Plug>(easymotion-bd-jk)
-nmap <Leader>l <Plug>(easymotion-overwin-line)
-
-" Move to word
-map  <Leader>w <Plug>(easymotion-bd-w)
-nmap <Leader>w <Plug>(easymotion-overwin-w)
-" ----------------------------------------------------------------------------------
-" Specific language settings
-" ----------------------------------------------------------------------------------
-" Rust
-"
-augroup rust
-    au!
-    autocmd FileType rust let b:dispatch = "cargo build"
-    " let g:rustfmt_autosave=1
-    autocmd FileType rust inoremap <buffer> <C-F9> <ESC>:update<bar>Dispatch cargo build<CR>
-    autocmd FileType rust nnoremap <buffer> <C-F9> :update<bar>Dispatch cargo build<CR>
-
-    autocmd FileType rust inoremap <buffer> <F10> <ESC>:update<bar>Dispatch cargo run<CR>
-    autocmd FileType rust inoremap <buffer> <S-F10> <ESC>:update<bar>Dispatch cargo run --release<CR>
-    autocmd FileType rust nnoremap <buffer> <F10> :update<bar>Dispatch cargo run<CR>
-    autocmd FileType rust nnoremap <buffer> <S-F10> :update<bar>Dispatch cargo run --release<CR>
-augroup end
-
-" Haskell
-let g:haskellmode_completion_ghc=0
-
-" neco-ghc
-autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
-let g:necoghc_enable_detailed_browse=1
-
-" Godot/Gdscript
-let g:ycm_language_server += [
-  \   {
-  \     'name': 'godot',
-  \     'filetypes': [ 'gdscript' ],
-  \     'project_root_files': [ 'project.godot' ],
-  \     'port': 6008
-  \   }
-  \ ]
-
-func! GodotSettings() abort
-    setlocal tabstop=4
-    nnoremap <buffer> <F4> :GodotRunLast<CR>
-    nnoremap <buffer> <F5> :GodotRun<CR>
-    nnoremap <buffer> <F6> :GodotRunCurrent<CR>
-    nnoremap <buffer> <F7> :GodotRunFZF<CR>
-endfunc
-augroup godot | au!
-    au FileType gdscript call GodotSettings()
-augroup end
 
 " ----------------------------------------------------------------------------------
 " Shortcuts
@@ -265,9 +249,12 @@ nnoremap <Leader>Y "+Y
 vnoremap <Leader>y "+y
 vnoremap <Leader>Y "+Y
 
-vnoremap p pgvy
+xnoremap p pgvy
 
-nnoremap <Leader>s :vsplit $NVIMRC
+nnoremap <Leader>s :vsplit ~/.config/nvim/init.vim
+" nnoremap <Leader>s :vsplit $NVIMRC
+" TODO Verificar se isso funciona no Windows
+" nnoremap <Leader>s :exe "vsplit ".stdpath('config').'/init.vim'
 " nnoremap <Leader>w :w<CR>
 
 " nnoremap <Leader>i <C-i>
@@ -287,8 +274,14 @@ imap <A-E> <C-o>E
 imap <A-b> <C-o>b
 imap <A-B> <C-o>B
 
+imap <Home> <c-o>^
+nmap <Home> ^
+
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
+
+" Duplicate lines in visual-line mode
+" xnoremap <expr> <c-d> mode() ==# "V" ? "y`>p1vo" : "<c-d>"
 
 :command W  w
 :command Wq wq
@@ -303,8 +296,8 @@ inoremap <c-w> <c-g>u<c-w>
 
 inoremap <C-CR> <Esc>O
 
-inoremap <C-d> <Esc>m`yyp``<Down>a
-nnoremap <C-d> m`yyp``<Down>
+" inoremap <C-d> <Esc>m`yyp``<Down>a
+" nnoremap <C-d> m`yyp``<Down>
 
 " Abrir o sublime em uma posição específica
 command Subl call Subl()
@@ -322,7 +315,7 @@ function Subl()
         let command = "!\"C:\\Program Files\\Sublime Text\\subl.exe\" -a " . location
 
         " Atualiza o arquivo e abre o Sublime
-        :silent up | silent exe command
+        :silent wa | silent exe command
     endif
 endfunction
 
@@ -341,24 +334,132 @@ function! CenteredFindNext(forward)
     endtry
 endfunction
 
+noremap <silent> <Leader>w :call ToggleWrap()<CR>
+function ToggleWrap()
+  if &wrap
+    echo "Wrap OFF"
+    setlocal nowrap
+    set virtualedit=all
+    silent! nunmap <buffer> <Up>
+    silent! nunmap <buffer> <Down>
+    silent! nunmap <buffer> <Home>
+    silent! nunmap <buffer> <End>
+    silent! iunmap <buffer> <Up>
+    silent! iunmap <buffer> <Down>
+    silent! iunmap <buffer> <Home>
+    silent! iunmap <buffer> <End>
+  else
+    echo "Wrap ON"
+    setlocal wrap linebreak nolist
+    set virtualedit=
+    setlocal display+=lastline
+    noremap  <buffer> <silent> <Up>   gk
+    noremap  <buffer> <silent> <Down> gj
+    noremap  <buffer> <silent> <Home> g<Home>
+    noremap  <buffer> <silent> <End>  g<End>
+    inoremap <buffer> <silent> <Up>   <C-o>gk
+    inoremap <buffer> <silent> <Down> <C-o>gj
+    inoremap <buffer> <silent> <Home> <C-o>g<Home>
+    inoremap <buffer> <silent> <End>  <C-o>g<End>
+  endif
+endfunction
+
+function! s:ActivateWrap()
+    if !&wrap
+        call ToggleWrap()
+    endif
+endfunction
+
+function! s:DeactivateWrap()
+    if &wrap
+        call ToggleWrap()
+    endif
+endfunction
+
 nnoremap <silent>n :call CenteredFindNext(1)<CR>
 nnoremap <silent>N :call CenteredFindNext(0)<CR>
 
 nnoremap <F7>   :cn<CR>
 nnoremap <S-F7> :cp<CR>
 
-command -nargs=+ Ack execute "silent! grep! <args> | botright copen"
+command -nargs=0 So execute "w | so %"
+
+" ----------------------------------------------------------------------------------
+" Busca
+" ----------------------------------------------------------------------------------
+:set wildignore+=*.o,*.obj,*.dll,*.exe,*.so
+
+function! Ack(...)
+    if a:0 < 2
+        :exe 'noa vimgrep /'. a:1 . '/j ** | botright copen'
+    else
+        :exe 'noa vimgrep /'. a:1 . '/j ' . join(a:000[1:]) . ' | botright copen'
+    endif
+endfunction
+
+let s:patterns = {
+                \'cpp': 'h c cpp hpp',
+                \'c': 'h c',
+                \}
+
+function! s:ExpandFilePattern(extensions)
+    return join(map(split(a:extensions, ' '), {p, v -> '**/*.' . v}))
+endfunction
+
+function! AckType(pattern, filetype)
+    :exe 'Ack ' . a:pattern . ' ' . s:ExpandFilePattern(s:patterns[a:filetype])
+endfunction
+
+function! AckThis(curr_word)
+    if has_key(s:patterns, &filetype)
+        return 'Ack ' . a:curr_word . ' ' . s:patterns[&filetype]
+    else
+        return 'Ack ' . a:curr_word
+    endif
+endfunction
+
+nnoremap <F3> :<C-r>=AckThis('<C-r><C-w>')<cr><cr>
+
+command -nargs=+ Ack call Ack(<f-args>)
+command -nargs=+ Ackt call AckType(<f-args>)
 
 command TODO execute "Ack TODO"
 
+" ----------------------------------------------------------------------------------
+" Copiar seleção visual para linha de comando
+" ----------------------------------------------------------------------------------
+" Post original: https://stackoverflow.com/questions/1533565/hot-to-get-visually-selected-text-in-vimscript#6271254
+function! GetVisualSelection(sep)
+    let [l_start, c_start] = getpos("'<")[1:2]
+    let [l_end, c_end] = getpos("'>")[1:2]
+
+    let lines = getline(l_start, l_end)
+    if len(lines) == 0
+        return ''
+    endif
+
+    let lines[-1] = lines[-1][: c_end - (&selection == 'inclusive' ? 1 : 2)]
+    let lines[0] = lines[0][c_start -1:]
+
+    return join(lines, a:sep)
+endfunction
+
+cnoremap <C-r><C-v> <C-r>=GetVisualSelection(' ')<cr>
+
 " Grep
 if executable("rg")
-    set grepprg=rg\ --vimgrep\ --smart-case\ --hidden
-    set grepformat=%f:%l:%c:%m
+    " set grepprg=rg\ --vimgrep\ --smart-case\ --hidden
+    " set grepformat=%f:%l:%c:%m
 
     let g:ctrlp_user_command = 'rg -g "!{target,build,node_modules}"  %s --files --color=never --glob ""'
     let g:ctrlp_use_caching = 0
 endif
+
+" ----------------------------------------------------------------------------------
+" Neovide
+" ----------------------------------------------------------------------------------
+let g:neovide_refresh_rate = 165
+let g:neovide_refresh_rate_idle = 165
 
 " ----------------------------------------------------------------------------------
 " Statusline
@@ -374,14 +475,22 @@ let g:currentmode={
        \ 'c'  : 'Command',
        \}
 
+function CassWrapModeName()
+    if exists('b:cass_wrap_mode') && b:cass_wrap_mode
+        return ' [WRAP ON]'
+    else
+        return ''
+    endif
+endfunction
 set statusline=
 set statusline+=\ [%{toupper(g:currentmode[mode()])}]
+set statusline+=%{CassWrapModeName()}
 set statusline+=\ (%l,\ %c)
 set statusline+=\ %f%m\ %y
 set statusline+=\ [%L\ lines]
 
 " ----------------------------------------------------------------------------------
-" Statusline
+" Tabs
 " ----------------------------------------------------------------------------------
 " Navegar as abas com Alt+{num}
 
@@ -414,3 +523,182 @@ vnoremap <A-5> 5gt
 vnoremap <A-6> 6gt
 vnoremap <A-7> 7gt
 vnoremap <A-6> 6gt
+
+" No continuation comment on new line
+autocmd BufNewFile,BufRead * setlocal formatoptions-=cro
+autocmd BufNew,BufNewFile,BufRead * let b:cass_wrap_mode=0
+
+augroup vim
+    au!
+    au FileType vim inoremap <F5> <esc>:So<cr>
+    au FileType vim nnoremap <F5> :So<cr>
+augroup end
+
+nmap <F1> q:
+imap <F1> <nop>
+nmap <F4> :q<cr>
+imap <F4> <Esc>:q<cr>
+
+nmap <Esc> :
+
+" cnoremap s/ %smagic/
+
+nnoremap <F2> :silent !explorer.exe .<cr>
+" match TrailingSpaceChar /\s\+$/
+" match TabChar /\t\+/
+"
+" autocmd BufWinEnter * match TrailingSpaceChar /\s+$/
+" autocmd InsertEnter * match TrailingSpaceChar /\s+$/
+" autocmd InsertLeave * match TrailingSpaceChar /\s+$/
+" autocmd BufWinEnter * match TabChar /\t\+/
+" autocmd InsertEnter * match TabChar /\t\+/
+" autocmd InsertLeave * match TabChar /\t\+/
+" autocmd BufWinLeave * call clearmatches()
+
+" ----------------------------------------------------------------------------------
+" Apagar coisas como no sublime
+" ----------------------------------------------------------------------------------
+inoremap <C-Backspace> <C-w>
+cnoremap <C-Backspace> <C-w>
+
+inoremap <C-Delete> <C-o>de
+nnoremap <C-Delete> de
+
+cnoremap <S-Delete> <C-u>
+inoremap <S-Delete> <C-o>dd
+nnoremap <S-Delete> dd
+" cmap <C-Delete> <???> " TODO Encontrar o comando para apagar uma palavra para a frente
+
+" cnoremap <C-r><C-v> ??? " TODO Implementar cópia do modo visual para a janela de comandos
+
+" ----------------------------------------------------------------------------------
+" Folds
+" ----------------------------------------------------------------------------------
+set foldmethod=indent
+set foldnestmax=10
+set nofoldenable
+set foldlevel=2
+
+" set virtualedit=all
+" set signcolumn=yes
+
+" ----------------------------------------------------------------------------------
+" User Command mode
+" ----------------------------------------------------------------------------------
+command CommandMode call UserCommands()
+function! UserCommands()
+    if bufexists('<COMMANDS>')==1
+        :let l:bufid = bufnr('<COMMANDS>')
+        :exe "buf " . l:bufid
+    else
+        if bufname() != ""
+            :enew|set bt=nofile ft=user_commands
+        else
+            :set bt=nofile ft=user_commands
+        endif
+        :let g:usr_commands_buf_id = bufnr()
+        :file <COMMANDS>
+    endif
+endfunction
+
+function! UserExecuteCommand()
+    :mark u
+    :exe "r!" . getline('.')
+    :'u
+endfunction
+
+function! UserExecuteVimCommand()
+    :mark u
+    :exe "pu = " . "trim(execute(\'" . getline('.') . "\'))"
+    :'u
+endfunction
+
+augroup usr_cmds
+    au!
+    au FileType user_commands nmap <F12> <cmd>call UserExecuteCommand()<cr>
+    au FileType user_commands nmap <F13> <cmd>call UserExecuteVimCommand()<cr>
+augroup end
+
+" ----------------------------------------------------------------------------------
+" Terminal embutido
+" ----------------------------------------------------------------------------------
+command -nargs=? Term tabe|term <f-args>
+
+tnoremap <C-\><C-\> <C-\><C-N>
+
+" ----------------------------------------------------------------------------------
+" Título
+" ----------------------------------------------------------------------------------
+set title
+
+" ----------------------------------------------------------------------------------
+" Aumentar e diminuir fonte
+" ----------------------------------------------------------------------------------
+let s:font_size = 12
+let s:font_name = 'Iosevka\ Custom\ Semi-Extended'
+
+exe 'set guifont=' . s:font_name . ':h' . s:font_size 
+" set guifont=Fira\ Mono:h11
+" set guifont=Fira\ Code:h10
+" set guifont=Monolisa:h9
+
+function! AdjustFontSize(amount)
+  let s:font_size = s:font_size+a:amount
+  :execute "GuiFont! " . s:font_name . ":h" . s:font_size
+endfunction
+
+noremap <C-ScrollWheelUp> :call AdjustFontSize(1)<CR>
+noremap <C-ScrollWheelDown> :call AdjustFontSize(-1)<CR>
+inoremap <C-ScrollWheelUp> <Esc>:call AdjustFontSize(1)<CR>a
+inoremap <C-ScrollWheelDown> <Esc>:call AdjustFontSize(-1)<CR>a
+
+noremap <c-PageUp> :call AdjustFontSize(1)<CR>
+noremap <c-PageDown> :call AdjustFontSize(-1)<CR>
+inoremap <C-PageUo> <Esc>:call AdjustFontSize(1)<CR>a
+inoremap <C-PageDown> <Esc>:call AdjustFontSize(-1)<CR>a
+
+" ----------------------------------------------------------------------------------
+" Lista de jumps
+" ----------------------------------------------------------------------------------
+function! GotoJump()
+  jumps
+  let j = input("Please select your jump: ")
+  if j != ''
+    let pattern = '\v\c^\+'
+    if j =~ pattern
+      let j = substitute(j, pattern, '', 'g')
+      execute "normal " . j . "\<c-i>"
+    else
+      execute "normal " . j . "\<c-o>"
+    endif
+  endif
+endfunction
+nnoremap <Leader>j :call GotoJump()<CR>
+
+set clipboard+=unnamedplus
+
+" ----------------------------------------------------------------------------------
+" Não-funções uteis
+" ----------------------------------------------------------------------------------
+" TODO não funciona por algum motivo
+function! DontUse_PrintHighlight()
+    :echo 'echo synIDattr(synID(line("."), col("."), 1), "name")'
+endfunction
+
+" Abrir o resultado de comando
+function! DontUse_BufferWithCommandResult()
+    :echo 'enew|pu=execute("?")|set bt=nofile'
+endfunction
+
+lua << EOF
+local lspconfig = require('lspconfig')
+-- local lspconfig = require('lspcompletion')
+-- local lsp = require('vim.lsp')
+
+
+lspconfig.clangd.setup {}
+
+-- vim.lsp.buf.completion(true)
+
+vim.keymap.set('i', '<C-Space>', vim.lsp.buf.hover, opts)
+EOF
